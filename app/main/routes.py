@@ -7,6 +7,7 @@ from langdetect import detect, LangDetectException
 from app import db
 from app.main.forms import EditProfileForm, EmptyForm, PostForm, SearchForm, \
     MessageForm
+from app.auth.forms import AdminRegistrationForm
 from app.models import User, Post, Message, Notification
 from app.translate import translate
 from app.main import bp
@@ -98,6 +99,7 @@ def edit_profile():
     form = EditProfileForm(current_user.username)
     if form.validate_on_submit():
         current_user.username = form.username.data
+        current_user.is_admin = form.is_admin.data
         current_user.first_name = form.first_name.data
         current_user.last_name = form.last_name.data
         current_user.company_name = form.company_name.data
@@ -108,6 +110,7 @@ def edit_profile():
         return redirect(url_for('main.edit_profile'))
     elif request.method == 'GET':
         form.username.data = current_user.username
+        form.is_admin.data = current_user.is_admin
         form.first_name.data = current_user.first_name
         form.last_name.data = current_user.last_name
         form.company_name.data = current_user.company_name
@@ -238,3 +241,34 @@ def notifications():
         'data': n.get_data(),
         'timestamp': n.timestamp
     } for n in notifications])
+
+# Admin Routes TODO move these to their own blueprint later
+
+@bp.route('/admin/create_user', methods=['GET', 'POST'])
+@login_required
+def create_user_profile():
+    if current_user.is_admin == True:
+        form = AdminRegistrationForm()
+        if form.validate_on_submit():
+            user = User(username=form.username.data, email=form.email.data)
+            user.set_password(form.password.data)
+            user.is_admin = form.is_admin.data
+            user.first_name = form.first_name.data
+            user.last_name = form.last_name.data
+            user.company_name = form.company_name.data
+            user.phone = form.phone.data
+            user.about_me = form.about.data
+            db.session.add(user)
+            db.session.commit()
+            flash(_('Successfully Added {} {}'.format(form.first_name.data, form.last_name.data)))
+            return redirect(url_for('main.user', username=form.username.data))
+        return render_template('auth/register.html', title=_('Add User'),
+                            form=form)
+    else:
+        flash(_('You do not have access to this functionality'))
+        return redirect(url_for('main.user', username=current_user.username))
+
+
+
+
+

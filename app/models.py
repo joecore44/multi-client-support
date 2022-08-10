@@ -133,6 +133,7 @@ class User(UserMixin, PaginatedAPIMixin, db.Model):
         return 'https://www.gravatar.com/avatar/{}?d=identicon&s={}'.format(
             digest, size)
 
+
     def follow(self, user):
         if not self.is_following(user):
             self.followed.append(user)
