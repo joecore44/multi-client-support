@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from datetime import datetime, timedelta
+import re
 import unittest
 from app import create_app, db
 from app.models import User, Post
@@ -18,11 +19,34 @@ class UserModelCase(unittest.TestCase):
         self.app_context = self.app.app_context()
         self.app_context.push()
         db.create_all()
+        self.client = self.app.test_client(use_cookies=True)
 
     def tearDown(self):
         db.session.remove()
         db.drop_all()
         self.app_context.pop()
+
+    def test_home_page(self):
+        response = self.client.get('/home')
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('Multi Client Support System' in response.get_data(
+            as_text=True))
+
+    def test_register_and_login(self):
+        response = self.client.post('/admin/create_user', data={
+            'username': 'joieshep',
+            'password1': 'testPass!',
+            'password2': 'testPass!!',
+            'is_admin': 'False',
+            'first_name': 'Joe',
+            'last_name': 'Shepard',
+            'company_name': 'Apollo Intell Agency',
+            'phone': '4692628504',
+            'about_me': 'This is an about me'
+        })
+        self.assertEqual(response.status_code, 302)
+
+
 
     def test_password_hashing(self):
         u = User(username='susan')
@@ -96,6 +120,8 @@ class UserModelCase(unittest.TestCase):
         self.assertEqual(f2, [p2, p3])
         self.assertEqual(f3, [p3, p4])
         self.assertEqual(f4, [p4])
+
+    
 
 
 if __name__ == '__main__':
