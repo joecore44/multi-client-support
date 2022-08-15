@@ -91,14 +91,15 @@ followers = db.Table(
 class User(UserMixin, PaginatedAPIMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     is_admin = db.Column(db.Boolean)
-    first_name = db.Column(db.String(32))
-    last_name = db.Column(db.String(32))
+    #first_name = db.Column(db.String(32))
+    #last_name = db.Column(db.String(32))
     username = db.Column(db.String(64), index=True, unique=True)
-    email = db.Column(db.String(120), index=True, unique=True)
-    phone = db.Column(db.String(120))
-    company_name = db.Column(db.String(140))
+    #email = db.Column(db.String(120), index=True, unique=True)
+   # phone = db.Column(db.String(120))
+    #company_name = db.Column(db.String(140))
     password_hash = db.Column(db.String(128))
     posts = db.relationship('Post', backref='author', lazy='dynamic')
+    profiles = db.relationship('TrainerProfile', backref='trainer', lazy='dynamic')
     about_me = db.Column(db.String(140))
     last_seen = db.Column(db.DateTime, default=datetime.utcnow)
     token = db.Column(db.String(32), index=True, unique=True)
@@ -298,3 +299,19 @@ class Task(db.Model):
     def get_progress(self):
         job = self.get_rq_job()
         return job.meta.get('progress', 0) if job is not None else 100
+
+
+class TrainerProfile(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    first_name = db.Column(db.String(24))
+    last_name = db.Column(db.String(24))
+    company_name = db.Column(db.String(64))
+    phone_number = db.Column(db.String(10))
+    website = db.Column(db.String(64))
+    branding_image = db.Column(db.String(120))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
+    def __repr__(self):
+        return '<TrainerProfile {}>'.format(self.body)
+
+
