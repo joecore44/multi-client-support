@@ -95,11 +95,12 @@ class User(UserMixin, PaginatedAPIMixin, db.Model):
     #last_name = db.Column(db.String(32))
     username = db.Column(db.String(64), index=True, unique=True)
     #email = db.Column(db.String(120), index=True, unique=True)
-   # phone = db.Column(db.String(120))
+    #phone = db.Column(db.String(120))
     #company_name = db.Column(db.String(140))
     password_hash = db.Column(db.String(128))
     posts = db.relationship('Post', backref='author', lazy='dynamic')
-    profiles = db.relationship('TrainerProfile', backref='trainer', lazy='dynamic')
+    profile = db.relationship('TrainerProfile', backref='user', uselist=False)
+    customer_profile = db.relationship('CustomerProfile', backref='user', uselist=False)
     about_me = db.Column(db.String(140))
     last_seen = db.Column(db.DateTime, default=datetime.utcnow)
     token = db.Column(db.String(32), index=True, unique=True)
@@ -312,6 +313,18 @@ class TrainerProfile(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
     def __repr__(self):
-        return '<TrainerProfile {}>'.format(self.body)
+        return '<TrainerProfile {}>'.format(self.id)
+
+
+class CustomerProfile(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    first_name = db.Column(db.String(24))
+    last_name = db.Column(db.String(24))
+    phone_number = db.Column(db.String(10))
+    branding_image = db.Column(db.String(120))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
+    def __repr__(self):
+        return '<CustomerProfile {}>'.format(self.id)
 
 

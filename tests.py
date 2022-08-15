@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 import re
 import unittest
 from app import create_app, db
-from app.models import User, Post
+from app.models import User, Post, TrainerProfile, CustomerProfile
 from config import Config
 
 
