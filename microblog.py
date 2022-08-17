@@ -1,4 +1,5 @@
 from app import create_app, db, cli
+import unittest
 from app.models import User, Post, Message, Notification, Task, TrainerProfile, CustomerProfile
 
 app = create_app()
@@ -10,4 +11,5 @@ def make_shell_context():
     return {'db': db, 'User': User, 'Post': Post, 'Message': Message,
             'Notification': Notification, 'Task': Task,
              'TrainerProfile': TrainerProfile,
-             'CustomerProfle': CustomerProfile}
+             'CustomerProfile': CustomerProfile,
+             'unittest': unittest}

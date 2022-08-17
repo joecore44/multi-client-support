@@ -32,20 +32,45 @@ class UserModelCase(unittest.TestCase):
         self.assertTrue('Multi Client Support System' in response.get_data(
             as_text=True))
 
-    def test_register_and_login(self):
-        response = self.client.post('/admin/create_user', data={
-            'username': 'joieshep',
-            'password1': 'testPass!',
-            'password2': 'testPass!!',
-            'is_admin': 'False',
-            'first_name': 'Joe',
-            'last_name': 'Shepard',
-            'company_name': 'Apollo Intell Agency',
-            'phone': '4692628504',
-            'about_me': 'This is an about me'
-        })
-        self.assertEqual(response.status_code, 302)
+    def test_customer_profile(self):
+        user = User(username='john', email='john@example.com')
+        db.session.add(user)
+        db.session.commit()
+        john = User.query.filter_by(username='john').first()
+        
+        customer = CustomerProfile(user=john)
+        customer.first_name = 'Test'
+        customer.last_name = 'Tester'
+        customer.phone_number = '9099987979'
+        customer.branding_image = 'path.to/image.jpg'
 
+        db.session.add(customer)
+        db.session.commit()
+    
+        new_user = CustomerProfile.query.filter_by(user=john).first()
+        
+        self.assertEqual(new_user.first_name, 'Test')
+        self.assertEqual(new_user.last_name, 'Tester')
+        self.assertEqual(new_user.phone_number, '9099987979')
+        self.assertEqual(new_user.branding_image, 'path.to/image.jpg')
+
+
+    def test_trainer_profile(self):
+        user = User(username='jordann', email='john@corenutritionpv.com')
+        db.session.add(user)
+        db.session.commit()
+        jordann = User.query.filter_by(username='jordann').first()
+
+        trainer = TrainerProfile(user=jordann)
+        trainer.first_name = 'Testtt'
+        trainer.last_name = 'Testerrr'
+        trainer.phone_number = '4994994999'
+        trainer.branding_image = 'path.to/images.jpg'
+
+        self.assertEqual(trainer.first_name, 'Testtt')
+        self.assertEqual(trainer.last_name, 'Testerrr')
+        self.assertEqual(trainer.phone_number, '4994994999')
+        self.assertEqual(trainer.branding_image, 'path.to/images.jpg')
 
 
     def test_password_hashing(self):
@@ -53,6 +78,7 @@ class UserModelCase(unittest.TestCase):
         u.set_password('cat')
         self.assertFalse(u.check_password('dog'))
         self.assertTrue(u.check_password('cat'))
+
 
     def test_avatar(self):
         u = User(username='john', email='john@example.com')
