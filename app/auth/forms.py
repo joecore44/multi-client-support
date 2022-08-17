@@ -51,6 +51,8 @@ class AdminRegistrationForm(FlaskForm):
     first_name = StringField(_l('First Name'), validators=[DataRequired()])
     last_name = StringField(_l('Last Name'), validators=[DataRequired()])
     company_name = StringField(_l('Company Name'), validators=[DataRequired()])
+    website = StringField(_l('Website'), validators=[DataRequired()])
+    branding_image = StringField(_l('Upload Your Picture'), validators=[DataRequired()])
     about = TextAreaField(_l('Brief Intro'), validators=[Length(min=0, max=140)])
     phone = StringField(_l('Phone'), validators=[DataRequired()])
     email = StringField(_l('Email'), validators=[DataRequired(), Email()])

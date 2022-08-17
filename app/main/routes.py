@@ -8,7 +8,7 @@ from app import db
 from app.main.forms import EditProfileForm, EmptyForm, PostForm, SearchForm, \
     MessageForm
 from app.auth.forms import AdminRegistrationForm
-from app.models import User, Post, Message, Notification
+from app.models import User, Post, Message, Notification, TrainerProfile
 from app.translate import translate
 from app.main import bp
 
@@ -97,6 +97,7 @@ def user_popup(username):
 @login_required
 def edit_profile():
     form = EditProfileForm(current_user.username)
+
     if form.validate_on_submit():
         current_user.username = form.username.data
         current_user.is_admin = form.is_admin.data
@@ -246,19 +247,22 @@ def notifications():
 
 @bp.route('/admin/create_user', methods=['GET', 'POST'])
 @login_required
-def create_user_profile():
+def create_trainer_profile():
     if current_user.is_admin == True:
         form = AdminRegistrationForm()
         if form.validate_on_submit():
             user = User(username=form.username.data, email=form.email.data)
             user.set_password(form.password.data)
             user.is_admin = form.is_admin.data
-            user.first_name = form.first_name.data
-            user.last_name = form.last_name.data
-            user.company_name = form.company_name.data
-            user.phone = form.phone.data
-            user.about_me = form.about.data
+            trainer = TrainerProfile(first_name=form.first_name.data)
+            trainer.last_name = form.last_name.data
+            trainer.company_name = form.company_name.data
+            trainer.phone_number = form.phone.data
+            trainer.website = form.website.data
+            trainer.branding_image = form.branding_image.data
+            trainer.about = form.about.data
             db.session.add(user)
+            db.session.add(trainer)
             db.session.commit()
             flash(_('Successfully Added {} {}'.format(form.first_name.data, form.last_name.data)))
             return redirect(url_for('main.user', username=form.username.data))

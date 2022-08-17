@@ -101,7 +101,6 @@ class User(UserMixin, PaginatedAPIMixin, db.Model):
     posts = db.relationship('Post', backref='author', lazy='dynamic')
     trainer_profile = db.relationship('TrainerProfile', backref='user', uselist=False)
     customer_profile = db.relationship('CustomerProfile', backref='user', uselist=False)
-    about_me = db.Column(db.String(140))
     last_seen = db.Column(db.DateTime, default=datetime.utcnow)
     token = db.Column(db.String(32), index=True, unique=True)
     token_expiration = db.Column(db.DateTime)
@@ -307,6 +306,7 @@ class TrainerProfile(db.Model):
     first_name = db.Column(db.String(24))
     last_name = db.Column(db.String(24))
     company_name = db.Column(db.String(64))
+    about = db.Column(db.String)
     phone_number = db.Column(db.String(10))
     website = db.Column(db.String(64))
     branding_image = db.Column(db.String(120))
@@ -345,11 +345,13 @@ class BillingPlan(db.Model):
         return '<CustomerProfile {}>'.format(self.id)
 
 class MealPlan(db.Model):
-    id = db.Column(db.Integprofileer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     meal_title = db.Column(db.String(64))
     meal_image = db.Column(db.String(120))
     meal_description = db.Column(db.String())
     meal_type = db.Column(db.String(10))
+
+
     
     trainer_id = db.Column(db.Integer, db.ForeignKey('trainer_profile.id'))
 
