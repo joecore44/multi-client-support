@@ -338,14 +338,14 @@ class BillingPlan(db.Model):
     plan_description = db.Column(db.String())
     plan_includes = db.Column(db.String())
     plan_how_it_works = db.Column(db.String())
-    
+    customer_subscription = db.relationship('CustomerSubscription', backref='plan', uselist=False)
     trainer_id = db.Column(db.Integer, db.ForeignKey('trainer_profile.id'))
 
     def __repr__(self):
         return '<CustomerProfile {}>'.format(self.id)
 
 class MealPlan(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integprofileer, primary_key=True)
     meal_title = db.Column(db.String(64))
     meal_image = db.Column(db.String(120))
     meal_description = db.Column(db.String())
@@ -355,3 +355,10 @@ class MealPlan(db.Model):
 
     def __repr__(self):
         return '<CustomerProfile {}>'.format(self.id)
+
+class CustomerSubscription(db.Model):
+    id = db.Column(db.Integer(), primary_key=True)
+    start_date = db.Column(db.DateTime)
+    is_active = db.Column(db.Boolean)
+    billing_id = db.Column(db.Integer, db.ForeignKey('billing_plan.id'))
+    trainer_id = db.Column(db.Integer, db.ForeignKey('customer_profile.id'))
