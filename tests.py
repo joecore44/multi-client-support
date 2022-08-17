@@ -31,7 +31,7 @@ class UserModelCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue('Multi Client Support System' in response.get_data(
             as_text=True))
-
+    '''
     def test_customer_profile(self):
         user = User(username='john', email='john@example.com')
         db.session.add(user)
@@ -53,28 +53,34 @@ class UserModelCase(unittest.TestCase):
         self.assertEqual(new_user.last_name, 'Tester')
         self.assertEqual(new_user.phone_number, '9099987979')
         self.assertEqual(new_user.branding_image, 'path.to/image.jpg')
-
+    '''
 
     def test_trainer_profile(self):
         user = User(username='jordann', email='jordann@corenutritionpv.com')
         db.session.add(user)
         db.session.commit()
         jordann = User.query.filter_by(username='jordann').first()
+        jordan_profile = TrainerProfile(trainer=jordann)
 
-        trainer = jordann.trainer_profiles.first()
+        db.session.add(jordan_profile)
+        db.session.commit()
+
+        jordann2 = User.query.filter_by(username='jordann').first()
+        trainer = jordann2.trainer_profiles.first()
         trainer.first_name = 'Testtt'
         trainer.last_name = 'Testerrr'
         trainer.phone_number = '4994994999'
         trainer.branding_image = 'path.to/images.jpg'
-        
+
         db.session.add(trainer)
         db.session.commit()
 
         new_jordann = User.query.filter_by(username='jordann').first()
-        self.assertEqual(new_jordann.first_name, 'Testtt')
-        self.assertEqual(new_jordann.last_name, 'Testerrr')
-        self.assertEqual(new_jordann.phone_number, '4994994999')
-        self.assertEqual(new_jordann.branding_image, 'path.to/images.jpg')
+        new_profile = new_jordann.trainer_profiles.first()
+        self.assertEqual(new_profile.first_name, 'Testtt')
+        self.assertEqual(new_profile.last_name, 'Testerrr')
+        self.assertEqual(new_profile.phone_number, '4994994999')
+        self.assertEqual(new_profile.branding_image, 'path.to/images.jpg')
 
     def test_billing_plans(self):
         user = User(username='jordann', email='john@corenutritionpv.com')
