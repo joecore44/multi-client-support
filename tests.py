@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 import re
 import unittest
 from app import create_app, db
-from app.models import User, Post, TrainerProfile, CustomerProfile, BillingPlan
+from app.models import User, Post, TrainerProfile, CustomerProfile, BillingPlan, CustomerSubscription
 from config import Config
 
 
@@ -56,27 +56,40 @@ class UserModelCase(unittest.TestCase):
 
 
     def test_trainer_profile(self):
-        user = User(username='jordann', email='john@corenutritionpv.com')
+        user = User(username='jordann', email='jordann@corenutritionpv.com')
         db.session.add(user)
         db.session.commit()
         jordann = User.query.filter_by(username='jordann').first()
 
-        trainer = TrainerProfile(user=jordann)
+        trainer = jordann.trainer_profiles.first()
         trainer.first_name = 'Testtt'
         trainer.last_name = 'Testerrr'
         trainer.phone_number = '4994994999'
         trainer.branding_image = 'path.to/images.jpg'
+        
+        db.session.add(trainer)
+        db.session.commit()
 
-        self.assertEqual(trainer.first_name, 'Testtt')
-        self.assertEqual(trainer.last_name, 'Testerrr')
-        self.assertEqual(trainer.phone_number, '4994994999')
-        self.assertEqual(trainer.branding_image, 'path.to/images.jpg')
+        new_jordann = User.query.filter_by(username='jordann').first()
+        self.assertEqual(new_jordann.first_name, 'Testtt')
+        self.assertEqual(new_jordann.last_name, 'Testerrr')
+        self.assertEqual(new_jordann.phone_number, '4994994999')
+        self.assertEqual(new_jordann.branding_image, 'path.to/images.jpg')
 
     def test_billing_plans(self):
         user = User(username='jordann', email='john@corenutritionpv.com')
         db.session.add(user)
         db.session.commit()
         jordann = User.query.filter_by(username='jordann').first()
+
+    def test_customer_subscription(self):
+        user = User(username='jordann', email='jordannjohn@corenutritionpv.com')
+        db.session.add(user)
+        db.session.commit()
+        jordann = User.query.filter_by(username='jordann').first()
+
+      
+
 
 
     def test_password_hashing(self):

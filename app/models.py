@@ -91,16 +91,12 @@ followers = db.Table(
 class User(UserMixin, PaginatedAPIMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     is_admin = db.Column(db.Boolean)
-    #first_name = db.Column(db.String(32))
-    #last_name = db.Column(db.String(32))
     username = db.Column(db.String(64), index=True, unique=True)
     email = db.Column(db.String(120), index=True, unique=True)
-    #phone = db.Column(db.String(120))
-    #company_name = db.Column(db.String(140))
     password_hash = db.Column(db.String(128))
     posts = db.relationship('Post', backref='author', lazy='dynamic')
-    trainer_profile = db.relationship('TrainerProfile', backref='user', uselist=False)
-    customer_profile = db.relationship('CustomerProfile', backref='user', uselist=False)
+    trainer_profiles = db.relationship('TrainerProfile', backref='trainer', lazy='dynamic')
+    customer_profiles = db.relationship('CustomerProfile', backref='customer', lazy='dynamic')
     last_seen = db.Column(db.DateTime, default=datetime.utcnow)
     token = db.Column(db.String(32), index=True, unique=True)
     token_expiration = db.Column(db.DateTime)
@@ -119,6 +115,8 @@ class User(UserMixin, PaginatedAPIMixin, db.Model):
     notifications = db.relationship('Notification', backref='user',
                                     lazy='dynamic')
     tasks = db.relationship('Task', backref='user', lazy='dynamic')
+
+
 
     def __repr__(self):
         return '<User {}>'.format(self.username)

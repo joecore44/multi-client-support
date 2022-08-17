@@ -8,7 +8,7 @@ from app import db
 from app.main.forms import EditProfileForm, EmptyForm, PostForm, SearchForm, \
     MessageForm
 from app.auth.forms import AdminRegistrationForm
-from app.models import User, Post, Message, Notification, TrainerProfile
+from app.models import User, Post, Message, Notification
 from app.translate import translate
 from app.main import bp
 
@@ -67,6 +67,24 @@ def explore():
     return render_template('index.html', title=_('Explore'),
                            posts=posts.items, next_url=next_url,
                            prev_url=prev_url)
+
+@bp.route('/trainer/<username>')
+def trainer_profile(username):
+    user = User.query.filter_by(username=username).first()
+    profile = user.trainer_profiles.first()
+    page = request.args.get('page', 1, type=int)
+    posts = user.posts.order_by(Post.timestamp.desc()).paginate(
+        page, current_app.config['POSTS_PER_PAGE'], False)
+    next_url = url_for('main.user', username=user.username,
+                       page=posts.next_num) if posts.has_next else None
+    prev_url = url_for('main.user', username=user.username,
+                       page=posts.prev_num) if posts.has_prev else None
+    form = EmptyForm()
+    return render_template('trainer.html', user=user, posts=posts.items,
+                           next_url=next_url, prev_url=prev_url, form=form, profile=profile)
+
+
+    return profile.last_name
 
 
 @bp.route('/user/<username>')
