@@ -311,6 +311,7 @@ class TrainerProfile(db.Model):
     website = db.Column(db.String(64))
     branding_image = db.Column(db.String(120))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    trainer_profile = db.relationship('BillingPlan', backref='trainer', uselist=False)
 
     def __repr__(self):
         return '<TrainerProfile {}>'.format(self.id)
@@ -328,3 +329,17 @@ class CustomerProfile(db.Model):
         return '<CustomerProfile {}>'.format(self.id)
 
 
+class BillingPlan(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    plan_title = db.Column(db.String(64))
+    plan_image = db.Column(db.String(120))
+    plan_is_active = db.Column(db.Boolean())
+    plan_price = db.Column(db.Float())
+    plan_description = db.Column(db.String())
+    plan_includes = db.Column(db.String())
+    plan_how_it_works = db.Column(db.String())
+    
+    trainer_id = db.Column(db.Integer, db.ForeignKey('trainer_profile.id'))
+
+    def __repr__(self):
+        return '<CustomerProfile {}>'.format(self.id)

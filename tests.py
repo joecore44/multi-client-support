@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 import re
 import unittest
 from app import create_app, db
-from app.models import User, Post, TrainerProfile, CustomerProfile
+from app.models import User, Post, TrainerProfile, CustomerProfile, BillingPlan
 from config import Config
 
 
@@ -71,6 +71,12 @@ class UserModelCase(unittest.TestCase):
         self.assertEqual(trainer.last_name, 'Testerrr')
         self.assertEqual(trainer.phone_number, '4994994999')
         self.assertEqual(trainer.branding_image, 'path.to/images.jpg')
+
+    def test_billing_plans(self):
+        user = User(username='jordann', email='john@corenutritionpv.com')
+        db.session.add(user)
+        db.session.commit()
+        jordann = User.query.filter_by(username='jordann').first()
 
 
     def test_password_hashing(self):
