@@ -12,6 +12,7 @@ class EditProfileForm(FlaskForm):
     first_name = StringField(_l('First Name'), validators=[DataRequired()])
     last_name = StringField(_l('Last Name'), validators=[DataRequired()])
     company_name = StringField(_l('Company Name'), validators=[DataRequired()])
+    branding_image = StringField(_l('Your Logo'))
     phone = StringField(_l('Phone'), validators=[DataRequired()])
     about_me = TextAreaField(_l('About me'),
                              validators=[Length(min=0, max=140)])

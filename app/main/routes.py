@@ -84,9 +84,6 @@ def trainer_profile(username):
                            next_url=next_url, prev_url=prev_url, form=form, profile=profile)
 
 
-    return profile.last_name
-
-
 @bp.route('/user/<username>')
 @login_required
 def user(username):
@@ -111,30 +108,32 @@ def user_popup(username):
     return render_template('user_popup.html', user=user, form=form)
 
 
-@bp.route('/edit_profile', methods=['GET', 'POST'])
+@bp.route('/edit_trainer', methods=['GET', 'POST'])
 @login_required
 def edit_profile():
     form = EditProfileForm(current_user.username)
-
+    profile = current_user.trainer_profiles.first()
     if form.validate_on_submit():
         current_user.username = form.username.data
         current_user.is_admin = form.is_admin.data
-        current_user.first_name = form.first_name.data
-        current_user.last_name = form.last_name.data
-        current_user.company_name = form.company_name.data
-        current_user.phone = form.phone.data
-        current_user.about_me = form.about_me.data
+        profile.first_name = form.first_name.data
+        profile.last_name = form.last_name.data
+        profile.company_name = form.company_name.data
+        profile.phone = form.phone.data
+        profile.about = form.about_me.data
+        profile.branding_image = form.branding_image.data
         db.session.commit()
         flash(_('Your changes have been saved.'))
         return redirect(url_for('main.edit_profile'))
     elif request.method == 'GET':
         form.username.data = current_user.username
         form.is_admin.data = current_user.is_admin
-        form.first_name.data = current_user.first_name
-        form.last_name.data = current_user.last_name
-        form.company_name.data = current_user.company_name
-        form.phone.data = current_user.phone
-        form.about_me.data = current_user.about_me
+        form.first_name.data = profile.first_name
+        form.last_name.data = profile.last_name
+        form.company_name.data = profile.company_name
+        form.phone.data = profile.phone_number
+        form.about_me.data = profile.about
+        form.branding_image.data = profile.branding_image
     return render_template('edit_profile.html', title=_('Edit Profile'),
                            form=form)
 
@@ -263,7 +262,7 @@ def notifications():
 
 # Admin Routes TODO move these to their own blueprint later
 
-@bp.route('/admin/create_user', methods=['GET', 'POST'])
+@bp.route('/admin/create_trainer', methods=['GET', 'POST'])
 @login_required
 def create_trainer_profile():
     if current_user.is_admin == True:
