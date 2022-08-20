@@ -4,9 +4,9 @@ from flask_login import login_user, logout_user, current_user
 from flask_babel import _
 from app import db
 from app.auth import bp
-from app.auth.forms import LoginForm, RegistrationForm, \
-    ResetPasswordRequestForm, ResetPasswordForm
-from app.models import User
+from app.auth.forms import LoginForm, RegisterTrainerForm, \
+    ResetPasswordRequestForm, ResetPasswordForm, RegisterCustomerForm
+from app.models import User, TrainerProfile
 from app.auth.email import send_password_reset_email
 
 
@@ -33,12 +33,16 @@ def logout():
     logout_user()
     return redirect(url_for('main.index'))
 
-
 @bp.route('/register', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
         return redirect(url_for('main.index'))
-    form = RegistrationForm()
+    return render_template('auth/sign-up.html', title=_('Register'))
+
+
+@bp.route('/register/customer', methods=['GET', 'POST'])
+def register_customer():
+    form = RegisterCustomerForm()
     if form.validate_on_submit():
         user = User(username=form.username.data, email=form.email.data)
         user.set_password(form.password.data)
@@ -48,6 +52,30 @@ def register():
         return redirect(url_for('auth.login'))
     return render_template('auth/register.html', title=_('Register'),
                            form=form)
+
+@bp.route('/trainer/register', methods=['GET', 'POST'])
+def register_trainer():
+    if current_user.is_authenticated:
+        return redirect(url_for('main.index'))
+    form = RegisterTrainerForm()
+    if form.validate_on_submit():
+        user = User(username=form.username.data, email=form.email.data)
+        user.user_type = 'Trainer'
+        user.set_password(form.password.data)
+        trainer = TrainerProfile(first_name=form.first_name.data)
+        trainer.last_name = form.last_name.data
+        trainer.company_name = form.company_name.data
+        trainer.phone_number = form.phone.data
+        trainer.website = form.website.data
+        trainer.branding_image = form.branding_image.data
+        trainer.about = form.about.data
+        db.session.add(user)
+        db.session.add(trainer)
+        db.session.commit()
+        flash(_('Congratulations {} {}'.format(form.first_name.data, form.last_name.data)))
+        return redirect(url_for('main.user', username=form.username.data))
+    return render_template('auth/register.html', title=_('Trainer Signup'),
+                        form=form)
 
 
 @bp.route('/reset_password_request', methods=['GET', 'POST'])

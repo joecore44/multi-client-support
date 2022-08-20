@@ -7,7 +7,7 @@ from langdetect import detect, LangDetectException
 from app import db
 from app.main.forms import EditProfileForm, EmptyForm, PostForm, SearchForm, \
     MessageForm
-from app.auth.forms import AdminRegistrationForm
+from app.auth.forms import AdminCreateTrainerForm
 from app.models import User, Post, Message, Notification
 from app.translate import translate
 from app.main import bp
@@ -30,6 +30,10 @@ def home():
 @bp.route('/index', methods=['GET', 'POST'])
 @login_required
 def index():
+    if current_user.user_type == 'Trainer':
+        return redirect(url_for('main.trainer_index'))
+    else:
+        return redirect(url_for('main.index'))
     form = PostForm()
     if form.validate_on_submit():
         try:
@@ -52,6 +56,10 @@ def index():
     return render_template('index.html', title=_('Home'), form=form,
                            posts=posts.items, next_url=next_url,
                            prev_url=prev_url)
+
+@bp.route('/trainer_index')
+def trainer_index():
+    return '<h1>You Made It</h1>'
 
 
 @bp.route('/explore')
@@ -88,6 +96,7 @@ def trainer_profile(username):
 @login_required
 def user(username):
     user = User.query.filter_by(username=username).first_or_404()
+    profile = user.trainer_profiles.first()
     page = request.args.get('page', 1, type=int)
     posts = user.posts.order_by(Post.timestamp.desc()).paginate(
         page, current_app.config['POSTS_PER_PAGE'], False)
@@ -97,7 +106,7 @@ def user(username):
                        page=posts.prev_num) if posts.has_prev else None
     form = EmptyForm()
     return render_template('user.html', user=user, posts=posts.items,
-                           next_url=next_url, prev_url=prev_url, form=form)
+                           next_url=next_url, prev_url=prev_url, form=form, profile=profile)
 
 
 @bp.route('/user/<username>/popup')
@@ -266,9 +275,10 @@ def notifications():
 @login_required
 def create_trainer_profile():
     if current_user.is_admin == True:
-        form = AdminRegistrationForm()
+        form = AdminCreateTrainerForm()
         if form.validate_on_submit():
             user = User(username=form.username.data, email=form.email.data)
+            user.user_type = 'Trainer'
             user.set_password(form.password.data)
             user.is_admin = form.is_admin.data
             trainer = TrainerProfile(first_name=form.first_name.data)

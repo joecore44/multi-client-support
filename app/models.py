@@ -91,6 +91,7 @@ followers = db.Table(
 class User(UserMixin, PaginatedAPIMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     is_admin = db.Column(db.Boolean)
+    user_type = db.Column(db.String(12))
     username = db.Column(db.String(64), index=True, unique=True)
     email = db.Column(db.String(120), index=True, unique=True)
     password_hash = db.Column(db.String(128))
@@ -309,7 +310,8 @@ class TrainerProfile(db.Model):
     website = db.Column(db.String(64))
     branding_image = db.Column(db.String(120))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    plan_id = db.relationship('BillingPlan', backref='trainer', uselist=False)
+    billing_plans = db.relationship('BillingPlan', backref='billing_plan', lazy='dynamic')
+    meal_plans = db.relationship('MealPlan', backref='meal_plan', lazy='dynamic')
 
     def __repr__(self):
         return '<TrainerProfile {}>'.format(self.id)
@@ -344,12 +346,11 @@ class BillingPlan(db.Model):
 
 class MealPlan(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    free_plan = db.Column(db.Boolean)
     meal_title = db.Column(db.String(64))
     meal_image = db.Column(db.String(120))
     meal_description = db.Column(db.String())
     meal_type = db.Column(db.String(10))
-
-
     
     trainer_id = db.Column(db.Integer, db.ForeignKey('trainer_profile.id'))
 

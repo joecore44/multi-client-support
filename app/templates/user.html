@@ -3,10 +3,17 @@
 {% block app_content %}
     <table class="table table-hover">
         <tr>
-            <td width="256px"><img src="{{ user.avatar(256) }}"></td>
+            <td width="256px">
+                {% if profile.branding_image %}
+                <img src="{{ profile.branding_image }}"></td>
+                {% else %}
+                <img src="{{ user.avatar(256) }}"></td>
+                {% endif %}
             <td>
-                <h1>{{ _('User') }}: {{ user.first_name }} {{ user.last_name }}</h1>
-                {% if user.about_me %}<p>{{ user.about_me }}</p>{% endif %}
+                <h1>{{ _('User') }}: {{ profile.first_name }} {{ profile.last_name }}</h1>
+                {% if profile.company_name %}<p>{{ profile.company_name }}</p>{% endif %}
+                {% if profile.about %}<p>{{ profile.about }}</p>{% endif %}
+                {% if profile.website %}<p>{{ profile.website }}</p>{% endif %}
                 {% if user.last_seen %}
                 <p>{{ _('Last seen on') }}: {{ moment(user.last_seen).format('LLL') }}</p>
                 {% endif %}
